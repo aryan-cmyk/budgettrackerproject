@@ -1,0 +1,37 @@
+/* App.css */
+
+/* Light Mode (Default) */
+.app {
+    background-color: #f8f9fa;
+    color: #212529;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Dark Mode */
+.app.dark-mode {
+    background-color: #212529;
+    color: #f8f9fa;
+}
+
+.app-header {
+    padding: 10px;
+    text-align: right;
+    background-color: inherit;
+}
+
+.btn-secondary {
+    border: none;
+    color: #f8f9fa;
+    background-color: #6c757d;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}

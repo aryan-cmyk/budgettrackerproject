@@ -2,20 +2,30 @@ import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 
 const RemainingBudget = () => {
-	// Extracting budget and expenses from context
-	const { expenses, budget } = useContext(AppContext);
+    // Extract budget, expenses, and savings from context
+    const { expenses, budget, savings } = useContext(AppContext);
 
-	// Calculate total expenses
-	const totalExpenses = expenses.reduce((total, item) => total + item.cost, 0);
+    // Calculate total expenses
+    const totalExpenses = expenses.reduce((total, item) => total + item.cost, 0);
 
-	// Determine alert type based on budget comparison
-	const alertType = totalExpenses > budget ? 'alert-danger' : 'alert-success';
+    // Calculate remaining budget (excluding savings)
+    const remainingBudget = budget - totalExpenses - savings;
 
-	return (
-		<div className={`alert p-4 ${alertType}`}>
-			<span>Remaining: £{budget - totalExpenses}</span>
-		</div>
-	);
+    // Determine alert type based on budget comparison
+    let alertType = 'alert-success';
+    if (remainingBudget < 0) {
+        alertType = 'alert-danger'; // Overspent
+    } else if (remainingBudget < budget * 0.2) {
+        alertType = 'alert-warning'; // Less than 20% of the budget left
+    }
+
+    return (
+        <div className={`alert p-4 ${alertType}`}>
+            <span>
+                Remaining: {new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(remainingBudget)}
+            </span>
+        </div>
+    );
 };
 
 export default RemainingBudget;
