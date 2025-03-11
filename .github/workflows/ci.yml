@@ -1,0 +1,84 @@
+name: Django + React CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Upgrade Pip, Setuptools, and Wheel
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Create and Activate Virtual Environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Install Backend Dependencies
+        run: |
+          pip install --no-cache-dir -r requirements.txt
+
+      - name: Run Migrations
+        env:
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          source venv/bin/activate
+          python manage.py migrate
+
+      - name: Run Linting for Backend
+        run: |
+          source venv/bin/activate
+          pip install flake8
+          flake8 .
+
+      - name: Run Django Tests
+        run: |
+          source venv/bin/activate
+          python manage.py test
+
+      - name: Set up Node.js for Frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run Linting for Frontend
+        run: |
+          cd frontend
+          npm install eslint --save-dev
+          npx eslint .
+
+      - name: Build React Frontend
+        run: |
+          cd frontend
+          npm run build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to Production (Optional)
+        run: |
+          echo "Deploying application..."
+          # Add deployment steps here, e.g., AWS, Heroku, or DigitalOcean
